@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+	<meta name="HandheldFriendly" content="True">
+	<meta name="MobileOptimized" content="320">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Quizzy!</title>
+	<link rel="icon" href="/static/images/favico.ico">
+	{% assets "base_css" %}
+		<link href="{{ ASSET_URL }}" rel="stylesheet">
+	{% endassets %}
+	{% block custom_css %}
+	{% endblock %}
+</head>
+<body>
+	<div class="container">
+		{% block content %}
+		{% endblock %}
+	</div>
+
+	{% assets "base_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+	{% endassets %}
+	{% block custom_js %}
+	{% endblock %}
+</body>
+</html>

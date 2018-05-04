@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Quizzy!</title>
-</head>
-<body>
+{% extends 'application.html' %}
+{% block content %}
 	<h1> Welcome! </h1>
-</body>
-</html>
+	<form method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.name.label }}: {{ form.name() }} {% for error in form.name.errors %}{{ error }}{% endfor %}<br>
+        {{ form.submit() }}
+    </form>
+{% endblock %}

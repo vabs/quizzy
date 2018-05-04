@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% endblock %}
+
+
+{% block custom_js %}
+ <script type="text/javascript" charset="utf-8">
+    var socket;
+    var optionsTime;
+    $(document).ready(function(){
+        socket = io.connect('http://' + document.domain + ':' + location.port + '/play');
+        // called whenever page is refreshed or user is connected
+        socket.on('connect', function() {
+            socket.emit('joined', {});
+        });
+        
+        socket.on('status', function(data) {
+            console.log(data);
+        });
+
+        socket.on('options', function(data) {
+            console.log(data);
+            show_hide();
+            make_title(data['msg'])
+            make_options(data, data['msg']);
+        });
+
+        // USE FOR SETTING OF OPTIONS
+        // socket.on('message', function(data) {
+        //     $('#chat').val($('#chat').val() + data.msg + '\n');
+        //     $('#chat').scrollTop($('#chat')[0].scrollHeight);
+        // });
+
+        enable_options();
+    });
+
+    function show_hide() {
+        $("div#questionNumber").show();
+        $("div.waiting").hide();
+        $("div#options-container").show();
+    }
+
+    function enable_options() {
+        $('body').on('touchstart click', 'div.option', function() {
+            var timeToAnswer = time_passed();
+            var answer = "{\"ans\": [\""
+                        + $(this).attr('data-q')
+                        + "\",\"" 
+                        + $(this).html()
+                        + "\",\""
+                        + timeToAnswer
+                        + "\"] }";
+            
+            console.log('Sending Response: ' + $(this).html());
+            $.post('/answer', 
+                answer, 
+                function(data) {
+                console.log(data);
+                hide_show();
+            });
+        });
+    }
+
+    function hide_show() {
+        $("div.waiting").show();
+        $("div#options-container").hide();
+        $("div#questionNumber").hide();
+        $("div.waiting-text").html('Wait for next question!');
+    }
+
+    function leave_room() {
+        socket.emit('left', {}, function() {
+            socket.disconnect();
+
+            // go back to the login page
+            window.location.href = "{{ url_for('main.index') }}";
+        });
+    }
+
+    function make_title(titleHtml) {
+        $("div#questionNumber").html('');
+        var splitter = titleHtml.split(' ');
+        var titleText = splitter[splitter.length -1 ];
+        if(titleText.includes('test')) {
+            titleText = 'TEST QUESTION: ';
+        } else {
+            titleText = titleText.replace('q', 'QUESTION: ');
+        }
+        $("div#questionNumber").html(titleText);
+    }
+
+    function make_options(optionsHtml, ques) {
+        console.log(optionsHtml);
+        var optionsContainer = $("div#options-container");
+        optionsContainer.html('');
+        var options = optionsHtml['option'];
+        var optionsString = '';
+        var splitter = ques.split(" ");
+        var question = splitter[splitter.length - 1];
+        var optionTemplateStart = '<div data-q="' + question;
+        optionTemplateStart += '" id="option-a" class="option radius">';
+        var optionTemplateEnd = '</div>';
+        for(var index=0; index < options.length; index++) {
+            optionsString += optionTemplateStart;
+            optionsString += options[index];
+            optionsString += optionTemplateEnd;
+        }
+        optionsContainer.html(optionsString);
+        optionsTime = new Date();
+    }
+
+    function time_passed() {
+        var currentTime = new Date();
+        var dif = optionsTime.getTime() - currentTime.getTime();
+        var Seconds_from_T1_to_T2 = dif / 1000;
+        return Math.abs(Seconds_from_T1_to_T2);
+    }
+
+</script>
+{% endblock %}
