@@ -42,7 +42,7 @@ python-gnupg==0.4.0
 python-http-client==1.2.3
 python-slugify==1.2.4
 python-socketio==1.8.0
-PyYAML==3.12
+PyYAML==5.4
 requests==2.4.3
 requirements-txt==0.1.1
 sendgrid==2.2.1
